@@ -1,14 +1,17 @@
+// app/src/main/java/com/example/animalsapp/network/RetrofitInstance.kt
 package com.example.animalsapp.network
 
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+import com.example.animalsapp.services.AnimalsService
+import com.example.animalsapp.services.EnviromentService
 
 object RetrofitInstance {
-    private const val BASE_URL = "https://animals.juanfrausto.com/api/animals/"
+    private const val BASE_URL = "https://animals.juanfrausto.com/api/"
 
-    private val okHttpClient = OkHttpClient.Builder()
+    private val client: OkHttpClient = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
         .writeTimeout(30, TimeUnit.SECONDS)
@@ -17,16 +20,14 @@ object RetrofitInstance {
     private val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .client(okHttpClient)
+            .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
 
-    val animalsService: com.example.animalsapp.services.AnimalsService by lazy {
-        retrofit.create(com.example.animalsapp.services.AnimalsService::class.java)
-    }
+    val animalsService: AnimalsService =
+        retrofit.create(AnimalsService::class.java)
 
-    val enviromentService: com.example.animalsapp.services.EnviromentService by lazy {
-        retrofit.create(com.example.animalsapp.services.EnviromentService::class.java)
-    }
+    val envService: EnviromentService =
+        retrofit.create(EnviromentService::class.java)
 }

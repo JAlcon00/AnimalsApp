@@ -61,6 +61,8 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation("io.coil-kt.coil3:coil-compose:3.1.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.1.0")
+    implementation("androidx.compose.material:material-icons-extended:1.4.3")
+    implementation("io.coil-kt.coil3:coil-compose:3.1.0")
 
     val nav_version = "2.8.9"
 

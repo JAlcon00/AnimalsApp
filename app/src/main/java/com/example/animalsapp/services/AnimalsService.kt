@@ -1,14 +1,13 @@
 package com.example.animalsapp.services
 
-import com.example.animalsapp.models.AnimalsList
+import com.example.animalsapp.models.AnimalsItem
 import retrofit2.http.GET
 import retrofit2.http.Path
 
-
 interface AnimalsService {
     @GET("animals")
-    suspend fun getAnimals(): List<AnimalsList>
+    suspend fun getAnimals(): List<AnimalsItem>
 
-    @GET("enviroment")
-    suspend fun getAnimalById(@Path("id") id: String): AnimalsList)
+    @GET("animals/{id}")
+    suspend fun getAnimalById(@Path("id") id: String): AnimalsItem
 }
