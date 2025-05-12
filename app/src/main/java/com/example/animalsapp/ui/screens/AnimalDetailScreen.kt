@@ -1,118 +1,176 @@
 package com.example.animalsapp.ui.screens
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
 import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Button
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.lazy.LazyColumn
+import coil.compose.AsyncImage
+
 import com.example.animalsapp.models.AnimalsItem
-import com.example.animalsapp.ui.navigation.Screen
+import com.example.animalsapp.ui.theme.DarkGreen
+import com.example.animalsapp.ui.theme.LightGreen
+import com.example.animalsapp.ui.theme.PastelYellow
 import com.example.animalsapp.utils.UiState
 import com.example.animalsapp.viewmodel.AnimalDetailViewModel
-import kotlinx.coroutines.launch
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.runtime.LaunchedEffect
-import coil3.compose.AsyncImage
 
 @Composable
 fun AnimalDetailScreen(
     id: String,
     navController: NavHostController,
-    vm: AnimalDetailViewModel = viewModel()
-) {
+    vm: AnimalDetailViewModel = viewModel(),
+
+    ) {
     val uiState by vm.uiState.collectAsState()
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(id) {
         vm.fetchAnimal(id)
     }
 
-    when (uiState) {
-        is UiState.Loading -> {
-            Box(
-                Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        }
-        is UiState.Error -> {
-            val message = (uiState as UiState.Error).message
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text("Error: $message")
-                Spacer(Modifier.height(8.dp))
-                Button(onClick = { vm.fetchAnimal(id) }) {
-                    Text("Reintentar")
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = DarkGreen
+    ) {
+        when (uiState) {
+            is UiState.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = PastelYellow)
                 }
             }
-        }
-        is UiState.Success<*> -> {
-            val animal = (uiState as UiState.Success<AnimalsItem>).data
-            Column(
-                Modifier
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp)
-            ) {
-                Text(text = animal.name)
-                Spacer(Modifier.height(12.dp))
-                AsyncImage(
-                    model = animal.image,
-                    contentDescription = animal.name,
+            is UiState.Error -> {
+                val msg = (uiState as UiState.Error).message
+                Box(
+                    modifier = Modifier.fillMaxSize().padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Error: $msg",
+                        color = PastelYellow,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+            is UiState.Success<*> -> {
+                val animal = (uiState as UiState.Success<AnimalsItem>).data
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                )
-                Spacer(Modifier.height(12.dp))
-                Text(text = animal.description)
-                Spacer(Modifier.height(16.dp))
-                Text(text = "Hechos Interesantes")
-                Spacer(Modifier.height(8.dp))
-                animal.facts.forEach { fact ->
-                    Card(modifier = Modifier.padding(vertical = 4.dp)) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(8.dp)
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(16.dp)
+                ) {
+                    // Título
+                    Text(
+                        text = animal.name,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = PastelYellow
+                    )
+                    Spacer(Modifier.height(12.dp))
+
+                    // Imagen principal
+                    AsyncImage(
+                        model = animal.image,
+                        contentDescription = animal.name,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(220.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .border(2.dp, LightGreen, RoundedCornerShape(16.dp))
+                    )
+                    Spacer(Modifier.height(12.dp))
+
+                    // Descripción
+                    Text(
+                        text = animal.description,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = PastelYellow
+                    )
+                    Spacer(Modifier.height(20.dp))
+
+                    // Hechos interesantes
+                    Text(
+                        text = "Hechos Interesantes",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = PastelYellow
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    animal.facts.forEach { fact ->
+                        Card(
+                            shape = RoundedCornerShape(8.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = LightGreen.copy(alpha = 0.2f)
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
                         ) {
-                            Icon(Icons.Filled.Info, contentDescription = null)
-                            Spacer(Modifier.width(8.dp))
-                            Text(text = fact)
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(12.dp)
+                            ) {
+                                Text(
+                                    text = "•",
+                                    color = DarkGreen,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    text = fact,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = DarkGreen
+                                )
+                            }
                         }
                     }
-                }
-                Spacer(Modifier.height(16.dp))
-                Text(text = "Galería")
-                Spacer(Modifier.height(8.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.horizontalScroll(rememberScrollState())) {
-                    animal.imageGallery.forEach { img ->
-                        AsyncImage(
-                            model = img,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(100.dp)
-                                .padding(4.dp)
-                        )
+                    Spacer(Modifier.height(20.dp))
+
+                    // Galería
+                    Text(
+                        text = "Galería",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = PastelYellow
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(animal.imageGallery) { imgUrl ->
+                            AsyncImage(
+                                model = imgUrl,
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .clip(CircleShape)
+                                    .border(2.dp, LightGreen, CircleShape)
+                            )
+                        }
                     }
+
+                    Spacer(Modifier.height(80.dp)) // espacio para el bottom bar
                 }
             }
         }

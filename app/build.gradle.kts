@@ -74,9 +74,8 @@ dependencies {
     implementation("com.google.accompanist:accompanist-pager:0.30.1")
     implementation("com.google.accompanist:accompanist-pager-indicators:0.30.1")
 
-    // Coil 3 (correct group/artifact)
-    implementation("io.coil-kt.coil3:coil-compose:3.1.0")
-    implementation("io.coil-kt.coil3:coil-network-okhttp:3.1.0")
+    // Coil
+    implementation("io.coil-kt:coil-compose:2.4.0")
 
     // Navigation Compose
     val navVersion = "2.8.9"

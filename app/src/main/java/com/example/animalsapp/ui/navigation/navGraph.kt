@@ -1,8 +1,7 @@
-// app/src/main/java/com/example/animalsapp/ui/navigation/NavGraph.kt
 package com.example.animalsapp.ui.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier          // <- Import necesario
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -14,26 +13,31 @@ import com.example.animalsapp.ui.screens.EnvDetailScreen
 @Composable
 fun NavGraph(
     navController: NavHostController,
-    modifier: Modifier = Modifier    // <- Parámetro opcional
+    modifier: Modifier = Modifier
 ) {
     NavHost(
-        navController = navController,
+        navController   = navController,
         startDestination = Screen.AnimalsList.route,
-        modifier = modifier            // <- Aplica el padding aquí
+        modifier        = modifier
     ) {
+        // Lista de animales (paso posicional)
         composable(Screen.AnimalsList.route) {
             AnimalsListScreen(navController)
         }
+        // Lista de ambientes
         composable(Screen.EnvironmentsList.route) {
             EnvironmentsListScreen(navController)
         }
-        composable(Screen.AnimalDetail.route) { back ->
-            val id = back.arguments?.getString("id") ?: return@composable
+        // Detalle de un animal
+        composable(Screen.AnimalDetail.route) { backStackEntry ->
+            val id = backStackEntry.arguments?.getString("id") ?: return@composable
             AnimalDetailScreen(id, navController)
         }
-        composable(Screen.EnvDetail.route) { back ->
-            val id = back.arguments?.getString("id") ?: return@composable
+        // Detalle de un ambiente
+        composable(Screen.EnvDetail.route) { backStackEntry ->
+            val id = backStackEntry.arguments?.getString("id") ?: return@composable
             EnvDetailScreen(id, navController)
         }
     }
 }
+

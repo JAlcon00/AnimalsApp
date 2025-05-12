@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import coil3.compose.AsyncImage
+import coil.compose.AsyncImage
 import com.example.animalsapp.models.EnviromentItem
 import com.example.animalsapp.ui.navigation.Screen
 import com.example.animalsapp.utils.UiState
