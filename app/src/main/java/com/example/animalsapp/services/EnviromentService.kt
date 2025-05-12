@@ -4,10 +4,14 @@ import com.example.animalsapp.models.EnviromentItem
 import retrofit2.http.GET
 import retrofit2.http.Path
 
+/**
+ * Interfaz que define los métodos para acceder a la API de ambientes.
+ * Utiliza Retrofit para realizar las solicitudes HTTP.
+ */
 interface EnviromentService {
-    @GET("enviroments")
-    suspend fun getEnviroments(): List<EnviromentItem>
+    @GET("environments")
+    suspend fun getEnvironments(): List<EnviromentItem>
 
-    @GET("enviroments/{id}")
-    suspend fun getEnviromentById(@Path("id") id: String): EnviromentItem
+    @GET("environments/{id}")
+    suspend fun getEnvironmentById(@Path("id") id: String): EnviromentItem
 }
