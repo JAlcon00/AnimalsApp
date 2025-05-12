@@ -3,9 +3,10 @@ package com.example.animalsapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.example.animalsapp.ui.components.BottomBar
 import com.example.animalsapp.ui.navigation.NavGraph
@@ -18,23 +19,17 @@ class MainActivity : ComponentActivity() {
             AnimalsAppTheme {
                 val navController = rememberNavController()
                 Scaffold(
-                    bottomBar = { BottomBar(navController) }
+                    containerColor = MaterialTheme.colorScheme.background,
+                    bottomBar      = { BottomBar(navController) }
                 ) { padding ->
                     NavGraph(
-                        navController = navController,
-                        paddingValues = PaddingValues(paddingValues = padding)
-                    )
+                        modifier = Modifier.padding(padding),
+                        navController = navController)
                 }
             }
         }
     }
 }
 
-@Composable
-fun AnimalsAppTheme(
-    content: @Composable () -> Unit
-) {
-    AnimalsAppTheme {
-        content()
-    }
-}
+
+

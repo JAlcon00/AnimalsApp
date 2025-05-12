@@ -63,6 +63,9 @@ dependencies {
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.1.0")
     implementation("androidx.compose.material:material-icons-extended:1.4.3")
     implementation("io.coil-kt.coil3:coil-compose:3.1.0")
+    implementation("com.google.accompanist:accompanist-pager:0.30.1")
+    implementation("com.google.accompanist:accompanist-pager-indicators:0.30.1")
+
 
     val nav_version = "2.8.9"
 

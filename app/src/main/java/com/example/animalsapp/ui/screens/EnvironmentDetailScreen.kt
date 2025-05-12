@@ -3,51 +3,81 @@ package com.example.animalsapp.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
+import androidx.compose.material3.Button
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
-import com.example.animalsapp.network.RetrofitInstance
 import com.example.animalsapp.models.EnviromentItem
-import com.example.animalsapp.ui.navigation.Screen
+import com.example.animalsapp.utils.UiState
+import com.example.animalsapp.viewmodel.EnvDetailViewModel
 
 @Composable
-fun EnvDetailScreen(id: String, navController: NavHostController) {
-    val envState = remember { mutableStateOf<EnviromentItem?>(null) }
+fun EnvDetailScreen(
+    id: String,
+    navController: NavHostController,
+    vm: EnvDetailViewModel = viewModel()
+) {
+    val uiState by vm.uiState.collectAsState()
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(id) {
-        try {
-            val item = RetrofitInstance.envService.getEnviromentById(id)
-            envState.value = item
-        } catch (_: Exception) {
-            // manejar error si es necesario
-        }
+        vm.fetchEnvironment(id)
     }
 
-    envState.value?.let { env ->
-        Column(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp)
-        ) {
-            Text(text = env.name)
-            Spacer(Modifier.height(12.dp))
-            AsyncImage(
-                model = env.image,
-                contentDescription = env.name,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp)
-            )
-            Spacer(Modifier.height(12.dp))
-            Text(text = env.description)
-            Spacer(Modifier.height(16.dp))
-            // Lista de habitantes si estuviera disponible
+    when (uiState) {
+        is UiState.Loading -> {
+            Box(
+                Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+        is UiState.Error -> {
+            val message = (uiState as UiState.Error).message
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text("Error: $message")
+                Spacer(Modifier.height(8.dp))
+                Button(onClick = { vm.fetchEnvironment(id) }) {
+                    Text("Reintentar")
+                }
+            }
+        }
+        is UiState.Success<*> -> {
+            val env = (uiState as UiState.Success<EnviromentItem>).data
+            Column(
+                Modifier
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp)
+            ) {
+                Text(text = env.name)
+                Spacer(Modifier.height(12.dp))
+                AsyncImage(
+                    model = env.image,
+                    contentDescription = env.name,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp)
+                )
+                Spacer(Modifier.height(12.dp))
+                Text(text = env.description)
+            }
         }
     }
 }
