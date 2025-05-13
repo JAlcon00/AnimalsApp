@@ -1,18 +1,15 @@
 package com.example.animalsapp.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Pets
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -20,21 +17,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.animalsapp.models.AnimalsItem
-import com.example.animalsapp.ui.navigation.Screen
 import com.example.animalsapp.ui.theme.DarkGreen
 import com.example.animalsapp.ui.theme.Dimens
-import com.example.animalsapp.ui.theme.LightGreen
 import com.example.animalsapp.ui.theme.PastelYellow
 import com.example.animalsapp.utils.UiState
 import com.example.animalsapp.viewmodel.AnimalsListViewModel
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Pets
+import androidx.compose.foundation.layout.statusBarsPadding
 
 @Composable
 fun AnimalsListScreen(
@@ -47,22 +43,24 @@ fun AnimalsListScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(DarkGreen)
+            .statusBarsPadding()
+            .padding(Dimens.spaceMedium)
     ) {
-        // Header
+        // Header con título, descripción y botón Agregar
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = Dimens.spaceMedium, vertical = Dimens.spaceLarge),
+                .padding(bottom = Dimens.spaceMedium),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = "Animales",
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 28.sp),
                     color = Color.White
                 )
-                Spacer(modifier = Modifier.height(Dimens.spaceSmall))
+                Spacer(Modifier.height(Dimens.spaceSmall))
                 Text(
                     text = "Conoce a los animales más increíbles del mundo",
                     style = MaterialTheme.typography.bodyMedium,
@@ -70,66 +68,79 @@ fun AnimalsListScreen(
                 )
             }
             Button(
-                onClick = { /* TODO: acción Agregar */ },
+                onClick = { /* TODO: Acción Agregar */ },
+                shape = RoundedCornerShape(50),
                 colors = ButtonDefaults.buttonColors(containerColor = PastelYellow),
-                shape = CircleShape
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
             ) {
-                Icon(Icons.Filled.Pets, contentDescription = "Agregar")
-                Spacer(modifier = Modifier.width(Dimens.spaceSmall))
-                Text(text = "Agregar")
+                Icon(
+                    imageVector = Icons.Filled.Pets,
+                    contentDescription = "Agregar",
+                    tint = DarkGreen,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(Modifier.width(Dimens.spaceSmall))
+                Text(
+                    text = "Agregar",
+                    color = DarkGreen,
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         }
 
-        Spacer(modifier = Modifier.height(Dimens.spaceMedium))
-
-        // Lista
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-            contentPadding = PaddingValues(Dimens.spaceMedium),
-            verticalArrangement = Arrangement.spacedBy(Dimens.spaceLarge)
-        ) {
-            when (uiState) {
-                is UiState.Loading -> item {
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(color = PastelYellow)
-                    }
-                }
-                is UiState.Error -> item {
-                    Text(
-                        text = (uiState as UiState.Error).message ?: "Error desconocido",
-                        color = Color.Red,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
-                }
-                is UiState.Success -> {
-                    val list = (uiState as UiState.Success<List<AnimalsItem>>).data
+        // Cuerpo según estado
+        when (uiState) {
+            is UiState.Loading -> Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = PastelYellow)
+            }
+            is UiState.Error -> Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = (uiState as UiState.Error).message.orEmpty(),
+                    color = Color.Red,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = Dimens.spaceMedium)
+                )
+            }
+            is UiState.Success -> {
+                val list = (uiState as UiState.Success<List<AnimalsItem>>).data
+                LazyColumn(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(Dimens.spaceLarge)
+                ) {
                     items(list) { animal ->
                         Column(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    navController.navigate(Screen.AnimalDetail.createRoute(animal.id))
-                                },
+                                .clickable { navController.navigate("animal_detail/${animal.id}") }
+                                .padding(vertical = Dimens.spaceSmall),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             AsyncImage(
                                 model = animal.image,
                                 contentDescription = animal.name,
-                                contentScale = androidx.compose.ui.layout.ContentScale.Crop,
                                 modifier = Modifier
                                     .size(200.dp)
-                                    .clip(CircleShape)
-
+                                    .clip(CircleShape),
+                                contentScale = ContentScale.Crop
                             )
-                            Spacer(modifier = Modifier.height(Dimens.spaceSmall))
+                            Spacer(Modifier.height(Dimens.spaceSmall))
                             Text(
                                 text = animal.name,
                                 style = MaterialTheme.typography.titleMedium,
-                                color = Color.White
+                                color = Color.White,
+                                textAlign = TextAlign.Center
                             )
                         }
                     }

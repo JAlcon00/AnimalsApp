@@ -78,6 +78,9 @@ dependencies {
     // Coil
     implementation("io.coil-kt:coil-compose:2.4.0")
 
+    implementation ("com.squareup.okhttp3:logging-interceptor:4.11.0")
+
+
     // Navigation Compose
     val navVersion = "2.8.9"
     implementation("androidx.navigation:navigation-compose:$navVersion")
