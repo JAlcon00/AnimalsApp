@@ -92,13 +92,4 @@ jalcon00-animalsapp/
 
 ---
 
-## 🤝 Contribuciones
-
-1. Crear un *fork* del repositorio.
-2. Abrir una rama (`git checkout -b feature/nombre-feature`).
-3. Implementar cambios y añadir tests.
-4. Hacer commit con mensaje claro.
-5. Enviar Pull Request describiendo la mejora.
-
----
 
