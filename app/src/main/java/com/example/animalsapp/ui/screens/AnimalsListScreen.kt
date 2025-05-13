@@ -7,11 +7,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Pets
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -19,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -31,6 +33,8 @@ import com.example.animalsapp.ui.theme.LightGreen
 import com.example.animalsapp.ui.theme.PastelYellow
 import com.example.animalsapp.utils.UiState
 import com.example.animalsapp.viewmodel.AnimalsListViewModel
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Pets
 
 @Composable
 fun AnimalsListScreen(
@@ -43,7 +47,6 @@ fun AnimalsListScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(DarkGreen)
-        
     ) {
         // Header
         Row(
@@ -69,9 +72,9 @@ fun AnimalsListScreen(
             Button(
                 onClick = { /* TODO: acción Agregar */ },
                 colors = ButtonDefaults.buttonColors(containerColor = PastelYellow),
-                shape = RoundedCornerShape(Dimens.spaceLarge)
+                shape = CircleShape
             ) {
-                Icon(Icons.Filled.Pets, contentDescription = null)
+                Icon(Icons.Filled.Pets, contentDescription = "Agregar")
                 Spacer(modifier = Modifier.width(Dimens.spaceSmall))
                 Text(text = "Agregar")
             }
@@ -79,47 +82,48 @@ fun AnimalsListScreen(
 
         Spacer(modifier = Modifier.height(Dimens.spaceMedium))
 
-        when (uiState) {
-            is UiState.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = PastelYellow)
+        // Lista
+        LazyColumn(
+            modifier = Modifier.weight(1f),
+            contentPadding = PaddingValues(Dimens.spaceMedium),
+            verticalArrangement = Arrangement.spacedBy(Dimens.spaceLarge)
+        ) {
+            when (uiState) {
+                is UiState.Loading -> item {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = PastelYellow)
+                    }
                 }
-            }
-            is UiState.Error -> {
-                val message = (uiState as UiState.Error).message
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = "Error: $message", color = Color.Red)
+                is UiState.Error -> item {
+                    Text(
+                        text = (uiState as UiState.Error).message ?: "Error desconocido",
+                        color = Color.Red,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
                 }
-            }
-            is UiState.Success -> {
-                val list = (uiState as UiState.Success<List<AnimalsItem>>).data
-                LazyColumn(
-                    contentPadding = PaddingValues(Dimens.spaceMedium),
-                    verticalArrangement = Arrangement.spacedBy(Dimens.spaceLarge)
-                ) {
+                is UiState.Success -> {
+                    val list = (uiState as UiState.Success<List<AnimalsItem>>).data
                     items(list) { animal ->
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
                                     navController.navigate(Screen.AnimalDetail.createRoute(animal.id))
-                                }
-                                .padding(vertical = Dimens.spaceMedium),
+                                },
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             AsyncImage(
                                 model = animal.image,
                                 contentDescription = animal.name,
+                                contentScale = androidx.compose.ui.layout.ContentScale.Crop,
                                 modifier = Modifier
                                     .size(200.dp)
                                     .clip(CircleShape)
-                                    .border(2.dp, LightGreen, CircleShape)
+
                             )
                             Spacer(modifier = Modifier.height(Dimens.spaceSmall))
                             Text(
@@ -132,7 +136,5 @@ fun AnimalsListScreen(
                 }
             }
         }
-
-        Spacer(modifier = Modifier.height(80.dp)) // espacio para el bottom bar
     }
 }
