@@ -41,6 +41,7 @@ fun EnvironmentsListScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(DarkGreen)
+            .statusBarsPadding()
             .padding(Dimens.spaceMedium)
     ) {
         // Título
